@@ -355,7 +355,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
     <div class="pgy-inner">
       <div class="pgy-header-row">
         <span class="pgy-title">Training Milestones</span>
-        <button class="pgy-set-btn" onclick="openProfile()">✏️ Set my PGY year</button>
+        <button class="pgy-set-btn" onclick="openProfile()">✏️ Set my training phase</button>
       </div>
       <div class="pgy-row" id="pgy-row"></div>
     </div>
@@ -389,13 +389,13 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
     </div>
     <div class="search-row">
       <input class="search-input" id="res-search" placeholder="🔍 Search residents…" oninput="filterResidents()"/>
-      <select class="search-input" id="res-pgy-filter" style="flex:0;min-width:120px" onchange="filterResidents()">
-        <option value="all">All Years</option>
-        <option value="1">PGY-1</option>
-        <option value="2">PGY-2</option>
-        <option value="3">PGY-3</option>
-        <option value="4">PGY-4</option>
-        <option value="unset">Year not set</option>
+      <select class="search-input" id="res-phase-filter" style="flex:0;min-width:160px" onchange="filterResidents()">
+        <option value="all">All Phases</option>
+        <option value="1">Phase 1 · TTD</option>
+        <option value="2">Phase 2 · Foundations</option>
+        <option value="3">Phase 3 · Core</option>
+        <option value="4">Phase 4 · TTP</option>
+        <option value="unset">Phase not set</option>
       </select>
       <select class="search-input" id="res-stage-filter" style="flex:0;min-width:160px" onchange="filterResidents()">
         <option value="all">All Stages</option>
@@ -407,9 +407,9 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
       <select class="search-input" id="res-sort" style="flex:0;min-width:160px" onchange="filterResidents()">
         <option value="pct_desc">Sort: Most Complete</option>
         <option value="pct_asc">Sort: Least Complete</option>
-        <option value="pgy_asc">Sort: PGY Year</option>
         <option value="name_asc">Sort: Name A–Z</option>
         <option value="obs_desc">Sort: Most Observations</option>
+        <option value="phase_asc">Sort: Phase (1→4)</option>
       </select>
     </div>
     <div class="resident-grid" id="resident-grid"></div>
@@ -431,15 +431,32 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
         <span class="profile-label">Full Name</span>
         <input class="profile-input" id="prof-name" type="text" placeholder="Dr. Your Name"/>
       </div>
+      <div class="profile-field">
+        <span class="profile-label">Username</span>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <input class="profile-input" id="prof-username" type="text" placeholder="username" autocapitalize="none" disabled style="flex:1;background:#f9fafb;color:var(--muted);margin-bottom:0"/>
+          <button type="button" id="username-edit-btn" onclick="toggleUsernameEdit()" style="flex:0 0 auto;padding:.65rem .85rem;border:2px solid var(--border);border-radius:8px;background:white;font-weight:700;font-size:.78rem;color:var(--teal);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif">✏️ Change</button>
+        </div>
+        <div id="username-pw-wrap" style="display:none;margin-top:.6rem">
+          <span class="profile-label">Current Password <span style="font-weight:400;color:var(--muted)">(to confirm the change)</span></span>
+          <input class="profile-input" id="prof-username-pw" type="password" placeholder="Enter your current password"/>
+        </div>
+      </div>
     </div>
     <div class="profile-section">
-      <div class="profile-section-title">Training Year</div>
-      <p style="font-size:.75rem;color:var(--muted);margin-bottom:.85rem;line-height:1.6">Select your current PGY year. This highlights your active milestone block on the timeline.</p>
+      <div class="profile-section-title">Training Phase</div>
+      <p style="font-size:.75rem;color:var(--muted);margin-bottom:.85rem;line-height:1.6">Select your current training phase. This highlights your active milestone block on the timeline.</p>
       <div class="pgy-select-grid">
-        <button class="pgy-opt" id="pgy-opt-1" onclick="selectPGY(1)">PGY-1</button>
-        <button class="pgy-opt" id="pgy-opt-2" onclick="selectPGY(2)">PGY-2</button>
-        <button class="pgy-opt" id="pgy-opt-3" onclick="selectPGY(3)">PGY-3</button>
-        <button class="pgy-opt" id="pgy-opt-4" onclick="selectPGY(4)">PGY-4</button>
+        <button class="pgy-opt" id="pgy-opt-1" onclick="selectPGY(1)">Phase 1<br><span style="font-weight:500;font-size:.66rem;opacity:.7">PGY-1 · TTD</span></button>
+        <button class="pgy-opt" id="pgy-opt-2" onclick="selectPGY(2)">Phase 2<br><span style="font-weight:500;font-size:.66rem;opacity:.7">PGY-1/2 · Foundations</span></button>
+        <button class="pgy-opt" id="pgy-opt-3" onclick="selectPGY(3)">Phase 3<br><span style="font-weight:500;font-size:.66rem;opacity:.7">PGY-2/3 · Core</span></button>
+        <button class="pgy-opt" id="pgy-opt-4" onclick="selectPGY(4)">Phase 4<br><span style="font-weight:500;font-size:.66rem;opacity:.7">PGY-3/4 · TTP</span></button>
+      </div>
+      <div class="profile-field" style="margin-top:.85rem">
+        <span class="profile-label">PGY-1 Start Year <span style="font-weight:400;color:var(--muted)">(optional — used to gauge pace, e.g. July intake)</span></span>
+        <select class="profile-input" id="prof-startyear">
+          <option value="">— Not set —</option>
+        </select>
       </div>
     </div>
     <div class="profile-section">
@@ -505,7 +522,7 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, getDocs, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, getDocs, deleteDoc, collection } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAoWVsr7j98hahB_FFN7czD-0f_fCanZEw",
@@ -558,6 +575,7 @@ const EPAS=[
 ];
 
 const STAGE_COLOR={TTD:"#2563eb",Foundations:"#059669",Core:"#7c3aed",TTP:"#dc2626"};
+const PHASE_LABELS={1:"Phase 1 · TTD",2:"Phase 2 · Foundations",3:"Phase 3 · Core",4:"Phase 4 · TTP"};
 const STAGE_NAMES={TTD:"Transition to Discipline",Foundations:"Foundations",Core:"Core",TTP:"Transition to Practice"};
 // Moderator code stored as a hash — the actual code is never visible in source
 // Default code: EPA@Sidra2025!  (share only with PD / Associate PD)
@@ -569,6 +587,18 @@ let activeModal={epaId:null,reqKey:null,reqLabel:null};
 let modalType="real", modalObserver=null;
 let allResidents=[];
 let currentPGY=null; // user-set PGY year (1-4)
+
+// Populate the PGY-1 start-year dropdown (used for pace-based tracking)
+(function populateStartYearOptions(){
+  const sel=document.getElementById("prof-startyear");
+  if(!sel) return;
+  const nowYear=new Date().getFullYear();
+  for(let y=nowYear;y>=nowYear-6;y--){
+    const opt=document.createElement("option");
+    opt.value=y; opt.textContent=y;
+    sel.appendChild(opt);
+  }
+})();
 
 // ─────────────────────────────────────────────
 //  HASH
@@ -718,12 +748,21 @@ function updateStats(){
 //  PROFILE PANEL
 // ─────────────────────────────────────────────
 let selectedPGY=null;
+let usernameEditMode=false;
 
 window.openProfile=function(){
   // Pre-fill fields from currentUser
   document.getElementById("prof-name").value=currentUser.displayName||"";
   document.getElementById("prof-rotation").value=currentUser.rotation||"";
   document.getElementById("prof-site").value=currentUser.site||"";
+  document.getElementById("prof-username").value=currentUser.username||"";
+  document.getElementById("prof-startyear").value=currentUser.pgy1StartYear||"";
+  usernameEditMode=false;
+  const uInput=document.getElementById("prof-username");
+  uInput.disabled=true; uInput.style.background="#f9fafb"; uInput.style.color="var(--muted)";
+  document.getElementById("username-pw-wrap").style.display="none";
+  document.getElementById("prof-username-pw").value="";
+  document.getElementById("username-edit-btn").textContent="✏️ Change";
   selectedPGY=currentPGY;
   [1,2,3,4].forEach(n=>{
     document.getElementById("pgy-opt-"+n).classList.toggle("sel",n===selectedPGY);
@@ -745,72 +784,150 @@ window.selectPGY=function(n){
   });
 };
 
+window.toggleUsernameEdit=function(){
+  const input=document.getElementById("prof-username");
+  const pwWrap=document.getElementById("username-pw-wrap");
+  const btn=document.getElementById("username-edit-btn");
+  usernameEditMode=!usernameEditMode;
+  if(usernameEditMode){
+    input.disabled=false;
+    input.style.background="white";
+    input.style.color="var(--text)";
+    input.focus();
+    pwWrap.style.display="block";
+    btn.textContent="✕ Cancel";
+  }else{
+    input.disabled=true;
+    input.style.background="#f9fafb";
+    input.style.color="var(--muted)";
+    input.value=currentUser.username||"";
+    pwWrap.style.display="none";
+    document.getElementById("prof-username-pw").value="";
+    btn.textContent="✏️ Change";
+  }
+};
+
 window.saveProfile=async function(){
   const name=document.getElementById("prof-name").value.trim();
   const rotation=document.getElementById("prof-rotation").value.trim();
   const site=document.getElementById("prof-site").value;
+  const msg=document.getElementById("prof-save-msg");
   const btn=document.querySelector(".profile-save-btn");
   btn.disabled=true; btn.textContent="Saving…";
+  msg.style.color="";
   try{
-    const updates={displayName:name||currentUser.displayName,rotation,site,pgy:selectedPGY};
-    await setDoc(doc(db,"users",currentUser.username),{...currentUser,...updates});
-    currentUser={...currentUser,...updates};
+    let usernameChanged=false;
+    let newUsername=currentUser.username;
+
+    // Handle username change (requires password confirmation)
+    if(usernameEditMode){
+      newUsername=document.getElementById("prof-username").value.trim().toLowerCase();
+      if(newUsername!==currentUser.username){
+        const pw=document.getElementById("prof-username-pw").value;
+        if(!/^[a-z0-9_]+$/.test(newUsername)){
+          msg.textContent="Username: letters, numbers, underscores only.";
+          msg.style.color="#b91c1c";
+          btn.disabled=false; btn.textContent="Save Profile";
+          return;
+        }
+        if(!pw||hashPw(pw)!==currentUser.pwHash){
+          msg.textContent="Incorrect password — username not changed.";
+          msg.style.color="#b91c1c";
+          btn.disabled=false; btn.textContent="Save Profile";
+          return;
+        }
+        const existing=await getDoc(doc(db,"users",newUsername));
+        if(existing.exists()){
+          msg.textContent="That username is already taken.";
+          msg.style.color="#b91c1c";
+          btn.disabled=false; btn.textContent="Save Profile";
+          return;
+        }
+        usernameChanged=true;
+      }
+    }
+
+    const startYearRaw=document.getElementById("prof-startyear").value;
+    const pgy1StartYear=startYearRaw?parseInt(startYearRaw,10):null;
+    const updates={displayName:name||currentUser.displayName,rotation,site,pgy:selectedPGY,pgy1StartYear};
+
+    if(usernameChanged){
+      const oldUsername=currentUser.username;
+      const newUserData={...currentUser,...updates,username:newUsername};
+      // Copy user + progress docs to the new username, then remove the old ones
+      await setDoc(doc(db,"users",newUsername),newUserData);
+      const progSnap=await getDoc(doc(db,"progress",oldUsername));
+      if(progSnap.exists()) await setDoc(doc(db,"progress",newUsername),progSnap.data());
+      await deleteDoc(doc(db,"users",oldUsername));
+      if(progSnap.exists()) await deleteDoc(doc(db,"progress",oldUsername));
+
+      currentUser=newUserData;
+      localStorage.setItem("epa_session_user",newUsername);
+      usernameEditMode=false;
+      document.getElementById("username-pw-wrap").style.display="none";
+      document.getElementById("prof-username-pw").value="";
+      document.getElementById("username-edit-btn").textContent="✏️ Change";
+      const uInput=document.getElementById("prof-username");
+      uInput.disabled=true; uInput.style.background="#f9fafb"; uInput.style.color="var(--muted)";
+    }else{
+      await setDoc(doc(db,"users",currentUser.username),{...currentUser,...updates});
+      currentUser={...currentUser,...updates};
+    }
+
     currentPGY=selectedPGY;
     document.getElementById("user-display").textContent=currentUser.displayName||currentUser.username;
-    document.getElementById("prof-save-msg").textContent="✓ Profile saved";
+    msg.textContent="✓ Profile saved";
     renderPGYTimeline();
     setTimeout(()=>{
-      document.getElementById("prof-save-msg").textContent="";
+      msg.textContent="";
       closeProfile();
     },1200);
   }catch(e){
-    document.getElementById("prof-save-msg").textContent="Save failed — check connection.";
-    document.getElementById("prof-save-msg").style.color="#b91c1c";
+    msg.textContent="Save failed — check connection.";
+    msg.style.color="#b91c1c";
   }
   btn.disabled=false; btn.textContent="Save Profile";
 };
 
 // ─────────────────────────────────────────────
-//  PGY TIMELINE
+//  PHASE TIMELINE
 // ─────────────────────────────────────────────
-// Milestone mapping:
-//   PGY-1 months 1–3  → TTD          (2 EPAs)
-//   PGY-1 months 4–12 + PGY-2 months 1–3 → Foundations (11 EPAs)
-//   PGY-2 months 4–12 + PGY-3 months 1–3 → Core        (14 EPAs)
-//   PGY-3 months 4–12 + PGY-4           → TTP          (5 EPAs)
-const PGY_MILESTONES=[
-  {
-    pgy:"PGY-1",
-    years:"Year 1",
-    segments:[
-      {stage:"TTD",  label:"Transition to Discipline", months:"Months 1–3",   color:"#2563eb"},
-      {stage:"Foundations", label:"Foundations (begins)", months:"Months 4–12", color:"#059669"}
-    ]
-  },
-  {
-    pgy:"PGY-2",
-    years:"Year 2",
-    segments:[
-      {stage:"Foundations", label:"Foundations (completes)", months:"Months 1–3", color:"#059669"},
-      {stage:"Core", label:"Core (begins)", months:"Months 4–12", color:"#7c3aed"}
-    ]
-  },
-  {
-    pgy:"PGY-3",
-    years:"Year 3",
-    segments:[
-      {stage:"Core", label:"Core (completes)", months:"Months 1–3", color:"#7c3aed"},
-      {stage:"TTP",  label:"Transition to Practice (begins)", months:"Months 4–12", color:"#dc2626"}
-    ]
-  },
-  {
-    pgy:"PGY-4",
-    years:"Year 4",
-    segments:[
-      {stage:"TTP",  label:"Transition to Practice", months:"Full year", color:"#dc2626"}
-    ]
-  }
+// Phase mapping (CBME training phases, per RCPSC):
+//   Phase 1 → PGY-1 Months 1–3                      → TTD          (2 EPAs)
+//   Phase 2 → PGY-1 Months 4–12 + PGY-2 Months 1–3   → Foundations  (11 EPAs)
+//   Phase 3 → PGY-2 Months 4–12 + PGY-3 Months 1–3   → Core         (14 EPAs)
+//   Phase 4 → PGY-3 Months 4–12 + PGY-4              → TTP          (5 EPAs)
+const PHASE_MILESTONES=[
+  {phase:"Phase 1", stage:"TTD",         label:"Transition to Discipline", years:"PGY-1 · Months 1–3",                  color:"#2563eb"},
+  {phase:"Phase 2", stage:"Foundations", label:"Foundations",              years:"PGY-1 (Mo 4–12) + PGY-2 (Mo 1–3)",    color:"#059669"},
+  {phase:"Phase 3", stage:"Core",        label:"Core",                     years:"PGY-2 (Mo 4–12) + PGY-3 (Mo 1–3)",    color:"#7c3aed"},
+  {phase:"Phase 4", stage:"TTP",         label:"Transition to Practice",   years:"PGY-3 (Mo 4–12) + PGY-4",             color:"#dc2626"}
 ];
+
+// ─────────────────────────────────────────────
+//  PACE-BASED EXPECTED PROGRESS
+//  Assumes a July 1 academic-year start (RCPSC standard).
+//  Phase durations (months) and EPA totals, in order TTD/Foundations/Core/TTP.
+// ─────────────────────────────────────────────
+const PHASE_DURATIONS_MO=[3,12,12,21]; // sums to 48 months (4 years)
+const PHASE_EPA_TOTALS=[2,11,14,5];    // sums to 32 EPAs
+function computeExpectedDone(pgy1StartYear){
+  if(!pgy1StartYear) return null;
+  const start=new Date(pgy1StartYear,6,1); // July 1
+  const now=new Date();
+  let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
+  if(now.getDate()<start.getDate()) months-=1;
+  if(months<0) months=0;
+  if(months>48) months=48;
+  let remaining=months, expected=0;
+  for(let i=0;i<4;i++){
+    if(remaining<=0) break;
+    const dur=PHASE_DURATIONS_MO[i], total=PHASE_EPA_TOTALS[i];
+    if(remaining>=dur){ expected+=total; remaining-=dur; }
+    else{ expected+=total*(remaining/dur); remaining=0; }
+  }
+  return expected;
+}
 
 function renderPGYTimeline(){
   const row=document.getElementById("pgy-row");
@@ -823,50 +940,46 @@ function renderPGYTimeline(){
     stageStats[s]={done,total:epas.length,pct:Math.round(done/epas.length*100)};
   });
 
-  // If user set their PGY: that block = Active, earlier = Done, later = Upcoming
-  // If not set: auto-detect from progress (first incomplete = Active)
-  let statuses;
-  if(currentPGY){
-    statuses=PGY_MILESTONES.map((_,i)=>{
-      if(i+1 < currentPGY) return "done";
-      if(i+1 === currentPGY) return "active";
-      return "upcoming";
-    });
-  } else {
-    function pgyComplete(m){return[...new Set(m.segments.map(s=>s.stage))].every(s=>stageStats[s].pct===100);}
-    let foundActive=false;
-    statuses=PGY_MILESTONES.map(m=>{
-      if(pgyComplete(m)) return "done";
-      if(!foundActive){foundActive=true;return "active";}
-      return "upcoming";
-    });
-  }
+  let foundActive=false;
+  const statuses=PHASE_MILESTONES.map(m=>{
+    if(stageStats[m.stage].pct===100) return "done";
+    if(!foundActive){foundActive=true;return "active";}
+    return "upcoming";
+  });
 
-  row.innerHTML=PGY_MILESTONES.map((m,i)=>{
+  row.innerHTML=PHASE_MILESTONES.map((m,i)=>{
     const status=statuses[i];
+    const isUserPhase=currentPGY===(i+1);
+    const st=stageStats[m.stage];
+
     const statusHtml=status==="done"
       ?`<span class="pgy-status pgy-status-done">✓ Done</span>`
       :status==="active"
-      ?`<span class="pgy-status pgy-status-active">● You are here</span>`
+      ?`<span class="pgy-status pgy-status-active">● Active</span>`
       :`<span class="pgy-status pgy-status-upcoming">Upcoming</span>`;
 
-    const segsHtml=m.segments.map(seg=>{
-      const st=stageStats[seg.stage];
-      return `<div class="pgy-seg-row">
-        <div class="pgy-seg-label">${seg.label}</div>
-        <div class="pgy-seg-bottom">
-          <div class="pgy-bar-track"><div class="pgy-bar-fill" style="width:${st.pct}%;background:${seg.color}"></div></div>
-          <span class="pgy-seg-count" style="color:${seg.color}">${st.done}/${st.total}</span>
-        </div>
-      </div>`;
-    }).join("");
+    const youBadge=isUserPhase?`<span class="pgy-you-badge">You</span>`:"";
 
-    return `<div class="pgy-block ${status==="active"?"pgy-active":status==="done"?"pgy-done":""}">
+    return `<div class="pgy-block ${status==="active"?"pgy-active":status==="done"?"pgy-done":""} ${isUserPhase?"pgy-current-user":""}">
       <div class="pgy-top">
-        <span class="pgy-label">${m.pgy}</span>
+        <div style="display:flex;align-items:center;gap:.4rem">
+          <span class="pgy-label">${m.phase}</span>
+          ${youBadge}
+        </div>
         ${statusHtml}
       </div>
-      <div class="pgy-segs">${segsHtml}</div>
+      <div class="pgy-segs">
+        <div class="pgy-seg-row">
+          <div class="pgy-seg-label" style="white-space:normal;overflow:visible;text-overflow:clip">
+            ${m.label}
+            <span style="display:block;font-weight:500;color:rgba(255,255,255,.32);font-size:.66rem;margin-top:.15rem">${m.years}</span>
+          </div>
+          <div class="pgy-seg-bottom">
+            <div class="pgy-bar-track"><div class="pgy-bar-fill" style="width:${st.pct}%;background:${m.color}"></div></div>
+            <span class="pgy-seg-count" style="color:${m.color}">${st.done}/${st.total}</span>
+          </div>
+        </div>
+      </div>
     </div>`;
   }).join("");
 }
@@ -1209,22 +1322,18 @@ function renderResidentGrid(residents,stageFilter){
   const avgPct=Math.round(allStats.reduce((a,s)=>a+s.pct,0)/allStats.length);
   const totalObs=allStats.reduce((a,s)=>a+s.totalObs,0);
   const fullDone=allStats.filter(s=>s.pct===100).length;
-  const pgyBreakdown=[1,2,3,4].map(y=>{
-    const count=residents.filter(r=>r.pgy===y).length;
-    return count?`<span style="font-size:.68rem;background:rgba(255,255,255,.12);padding:.15rem .5rem;border-radius:999px;color:rgba(255,255,255,.8)">PGY-${y}: ${count}</span>`:"";
-  }).filter(Boolean).join("");
-  const cohortHtml=`<div style="grid-column:1/-1;background:linear-gradient(135deg,var(--navy),var(--teal));color:white;border-radius:12px;padding:1rem 1.5rem;margin-bottom:.25rem">
-    <div style="display:flex;gap:2rem;align-items:center;flex-wrap:wrap">
-      <div style="font-family:'Fraunces',serif;font-size:1rem;opacity:.7;flex:1">Cohort Overview · ${residents.length} residents</div>
-      <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${avgPct}%</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Avg Complete</div></div>
-      <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${totalObs}</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Total Obs</div></div>
-      <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${fullDone}</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Fully Done</div></div>
-    </div>
-    ${pgyBreakdown?`<div style="display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.75rem">${pgyBreakdown}</div>`:""}
+  const cohortHtml=`<div style="grid-column:1/-1;background:linear-gradient(135deg,var(--navy),var(--teal));color:white;border-radius:12px;padding:1rem 1.5rem;display:flex;gap:2rem;align-items:center;flex-wrap:wrap;margin-bottom:.25rem">
+    <div style="font-family:'Fraunces',serif;font-size:1rem;opacity:.7;flex:1">Cohort Overview · ${residents.length} residents</div>
+    <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${avgPct}%</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Avg Complete</div></div>
+    <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${totalObs}</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Total Obs</div></div>
+    <div style="text-align:center"><div style="font-size:1.5rem;font-weight:800;color:var(--gold-light)">${fullDone}</div><div style="font-size:.62rem;opacity:.6;text-transform:uppercase">Fully Done</div></div>
   </div>`;
 
   grid.innerHTML=cohortHtml+residents.map(res=>{
     const stats=calcResidentStats(res.progressData);
+    const phaseBadge=res.pgy&&PHASE_LABELS[res.pgy]
+      ?`<span style="font-size:.65rem;background:#eef2ff;color:#4338ca;padding:.15rem .55rem;border-radius:999px;font-weight:700;margin-left:.35rem;white-space:nowrap;display:inline-block">${PHASE_LABELS[res.pgy]}</span>`
+      :`<span style="font-size:.65rem;background:#f3f4f6;color:#9ca3af;padding:.15rem .55rem;border-radius:999px;font-weight:600;margin-left:.35rem;white-space:nowrap;display:inline-block">Phase not set</span>`;
     const stagePillsHtml=["TTD","Foundations","Core","TTP"].map(s=>{
       const sc=stats.stageStats[s];
       const col=STAGE_COLOR[s];
@@ -1232,23 +1341,23 @@ function renderResidentGrid(residents,stageFilter){
       const highlight=stageFilter!=="all"&&stageFilter===s;
       return `<span class="stage-pill" style="background:${col};${highlight?"outline:2px solid white;outline-offset:1px":""}">${shortS} ${sc.done}/${sc.total}</span>`;
     }).join("");
-    const flag=stats.pct<30?`<span style="font-size:.65rem;background:#fef2f2;color:#b91c1c;padding:.1rem .4rem;border-radius:999px;font-weight:700;margin-left:.35rem">Needs attention</span>`:
-               stats.pct>=80&&stats.pct<100?`<span style="font-size:.65rem;background:#f0fdf4;color:#059669;padding:.1rem .4rem;border-radius:999px;font-weight:700;margin-left:.35rem">Almost done!</span>`:"";
-    const lastActiveStr=res.lastUpdated?`<div style="font-size:.65rem;color:var(--muted);margin-top:.2rem;opacity:.7">Last active: ${new Date(res.lastUpdated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</div>`:"";
-    const pgyBadge=res.pgy?`<span style="font-size:.65rem;font-weight:700;background:#e0f2fe;color:#0369a1;padding:.15rem .5rem;border-radius:999px;margin-left:.4rem">PGY-${res.pgy}</span>`:`<span style="font-size:.65rem;color:var(--muted);margin-left:.4rem;opacity:.6">Year not set</span>`;
-    const rotationStr=(res.rotation||res.site)?`<div style="font-size:.68rem;color:var(--muted);margin-top:.15rem">📍 ${[res.rotation,res.site].filter(Boolean).join(" · ")}</div>`:"";
-    return `<div class="res-card" onclick="showResidentDetail('${res.username}')">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:.5rem">
-        <div>
-          <div class="res-name">${res.displayName||res.username}${flag}</div>
-          <div style="display:flex;align-items:center;flex-wrap:wrap;gap:.2rem;margin-top:.15rem">
-            <span class="res-username" style="margin:0">@${res.username}</span>${pgyBadge}
-          </div>
-          ${rotationStr}
-          ${lastActiveStr}
-        </div>
-      </div>
-      <div class="res-stats" style="margin-top:.75rem">
+    // Attention flag: pace-based (only when PGY-1 start year is set) or nearly done
+    let flag="";
+    if(stats.pct>=80&&stats.pct<100){
+      flag=`<span style="font-size:.65rem;background:#f0fdf4;color:#059669;padding:.1rem .4rem;border-radius:999px;font-weight:700;margin-left:.35rem">Almost done!</span>`;
+    }else{
+      const expected=computeExpectedDone(res.pgy1StartYear);
+      if(expected!==null&&expected>1&&stats.done<expected*0.75){
+        flag=`<span style="font-size:.65rem;background:#fef2f2;color:#b91c1c;padding:.1rem .4rem;border-radius:999px;font-weight:700;margin-left:.35rem" title="Expected ~${Math.round(expected)} EPAs done by now based on their PGY-1 start year; currently at ${stats.done}">⚠ Behind pace</span>`;
+      }
+    }
+    const lastActiveStr=res.lastUpdated?`<div style="font-size:.65rem;color:var(--muted);margin-top:.35rem;opacity:.7">Last active: ${new Date(res.lastUpdated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})}</div>`:"";
+    return `<div class="res-card" style="position:relative" onclick="showResidentDetail('${res.username}')">
+      <button onclick="deleteResident('${res.username}',event)" title="Remove this account" style="position:absolute;top:.75rem;right:.75rem;padding:.3rem .5rem;font-size:.72rem;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:6px;font-weight:700;cursor:pointer;line-height:1">🗑️</button>
+      <div class="res-name" style="padding-right:1.75rem">${res.displayName||res.username}${flag}</div>
+      <div class="res-username">@${res.username}${phaseBadge}</div>
+      ${lastActiveStr}
+      <div class="res-stats" style="margin-top:.65rem">
         <div class="res-stat"><span class="res-stat-val">${stats.done}</span><div class="res-stat-lbl">EPAs Done</div></div>
         <div class="res-stat"><span class="res-stat-val">${stats.pct}%</span><div class="res-stat-lbl">Complete</div></div>
         <div class="res-stat"><span class="res-stat-val">${stats.totalObs}</span><div class="res-stat-lbl">Observations</div></div>
@@ -1263,12 +1372,12 @@ function renderResidentGrid(residents,stageFilter){
 window.filterResidents=function(){
   const q=document.getElementById("res-search").value.toLowerCase();
   const stageFilter=document.getElementById("res-stage-filter").value;
-  const pgyFilter=document.getElementById("res-pgy-filter").value;
+  const phaseFilter=document.getElementById("res-phase-filter").value;
   const sortBy=document.getElementById("res-sort").value;
   let filtered=allResidents.filter(r=>(r.displayName||"").toLowerCase().includes(q)||(r.username||"").toLowerCase().includes(q));
-  // PGY filter
-  if(pgyFilter==="unset") filtered=filtered.filter(r=>!r.pgy);
-  else if(pgyFilter!=="all") filtered=filtered.filter(r=>String(r.pgy)===pgyFilter);
+  if(phaseFilter!=="all"){
+    filtered=filtered.filter(r=>phaseFilter==="unset"?!r.pgy:String(r.pgy)===phaseFilter);
+  }
   // Sort
   filtered.sort((a,b)=>{
     const sa=calcResidentStats(a.progressData);
@@ -1277,7 +1386,7 @@ window.filterResidents=function(){
     if(sortBy==="pct_asc") return sa.pct-sb.pct;
     if(sortBy==="obs_desc") return sb.totalObs-sa.totalObs;
     if(sortBy==="name_asc") return (a.displayName||a.username).localeCompare(b.displayName||b.username);
-    if(sortBy==="pgy_asc") return (a.pgy||99)-(b.pgy||99);
+    if(sortBy==="phase_asc") return (a.pgy||99)-(b.pgy||99);
     return sb.pct-sa.pct;
   });
   renderResidentGrid(filtered,stageFilter);
@@ -1309,14 +1418,11 @@ window.showResidentDetail=function(username){
     <div class="res-detail-header">
       <div>
         <div class="res-detail-name">${res.displayName||res.username}</div>
-        <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-top:.3rem">
-          <span style="font-size:.75rem;color:var(--muted)">@${res.username}</span>
-          ${res.pgy?`<span style="font-size:.7rem;font-weight:700;background:#e0f2fe;color:#0369a1;padding:.15rem .55rem;border-radius:999px">PGY-${res.pgy}</span>`:`<span style="font-size:.7rem;color:var(--muted);opacity:.6">Year not set</span>`}
-          ${res.rotation?`<span style="font-size:.7rem;color:var(--muted)">📍 ${res.rotation}${res.site?" · "+res.site:""}</span>`:""}
-        </div>
+        <div style="font-size:.75rem;color:var(--muted)">@${res.username} · ${res.pgy&&PHASE_LABELS[res.pgy]?PHASE_LABELS[res.pgy]:"Phase not set"} · Detailed EPA breakdown</div>
       </div>
       <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
         <button class="mod-btn mod-btn-export" style="font-size:.75rem;padding:.4rem .85rem" onclick="printResidentReport('${res.username}')">📄 Print Report</button>
+        <button style="font-size:.75rem;padding:.4rem .85rem;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;border-radius:8px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif" onclick="deleteResident('${res.username}')">🗑️ Remove Account</button>
         <button class="close-detail" onclick="document.getElementById('res-detail-panel').classList.remove('show')">Close ✕</button>
       </div>
     </div>
@@ -1328,6 +1434,38 @@ window.showResidentDetail=function(username){
     </div>`;
   panel.classList.add("show");
   panel.scrollIntoView({behavior:"smooth",block:"nearest"});
+};
+
+// ─────────────────────────────────────────────
+//  DELETE / REMOVE A RESIDENT ACCOUNT (moderator only)
+// ─────────────────────────────────────────────
+window.deleteResident=async function(username,ev){
+  if(ev) ev.stopPropagation(); // don't trigger the card's onclick when hit from the grid
+  const res=allResidents.find(r=>r.username===username);
+  if(!res) return;
+  if(currentUser&&currentUser.username===username){
+    alert("You can't remove your own account from here.");
+    return;
+  }
+  const label=res.displayName||res.username;
+  const sure=confirm(`Permanently remove ${label} (@${username})?\n\nThis deletes their account and ALL of their saved EPA progress. This cannot be undone.\n\nOnly do this for test/trial accounts — not real residents.`);
+  if(!sure) return;
+  const typed=prompt(`To confirm, type the username "${username}" exactly:`);
+  if(typed===null) return;
+  if(typed.trim().toLowerCase()!==username.toLowerCase()){
+    alert("Username didn't match — nothing was deleted.");
+    return;
+  }
+  try{
+    await deleteDoc(doc(db,"users",username));
+    await deleteDoc(doc(db,"progress",username));
+    allResidents=allResidents.filter(r=>r.username!==username);
+    const panel=document.getElementById("res-detail-panel");
+    if(panel) panel.classList.remove("show");
+    filterResidents();
+  }catch(e){
+    alert("Failed to delete this account — check your connection and try again.");
+  }
 };
 
 // ─────────────────────────────────────────────
@@ -1435,6 +1573,7 @@ window.exportCohortReport=function(){
     return `<tr style="border-bottom:1px solid #f3f4f6">
       <td style="padding:.65rem .75rem;font-weight:600;font-size:.88rem">${res.displayName||res.username}</td>
       <td style="padding:.65rem .75rem;font-size:.78rem;color:#6b7280">@${res.username}</td>
+      <td style="padding:.65rem .75rem;text-align:center;font-size:.78rem;font-weight:700;color:${res.pgy?"#4338ca":"#9ca3af"}">${res.pgy&&PHASE_LABELS[res.pgy]?PHASE_LABELS[res.pgy]:"—"}</td>
       <td style="padding:.65rem .75rem;text-align:center;font-family:'Fraunces',serif;font-size:1.1rem;color:#c9962a;font-weight:700">${stats.done}/${stats.total}</td>
       <td style="padding:.65rem .75rem;text-align:center;font-weight:700;color:${stats.pct>=80?"#059669":stats.pct>=50?"#c9962a":"#dc2626"}">${stats.pct}%</td>
       <td style="padding:.65rem .75rem;text-align:center">${stats.totalObs}</td>
@@ -1462,6 +1601,7 @@ window.exportCohortReport=function(){
     <tr style="background:#f3f4f6">
       <th style="padding:.6rem .75rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">Resident</th>
       <th style="padding:.6rem .75rem;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">Username</th>
+      <th style="padding:.6rem .75rem;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">Phase</th>
       <th style="padding:.6rem .75rem;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">EPAs Done</th>
       <th style="padding:.6rem .75rem;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">Overall %</th>
       <th style="padding:.6rem .75rem;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:#6b7280">Observations</th>
