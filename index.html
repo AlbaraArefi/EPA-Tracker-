@@ -4,13 +4,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPA Tracker — Sidra Medicine Pediatrics</title>
+<script>
+// Applied before first paint to avoid a flash of the wrong theme.
+(function(){
+  var saved=localStorage.getItem("epa_theme");
+  var theme=saved||((window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches)?"dark":"light");
+  document.documentElement.setAttribute("data-theme",theme);
+})();
+window.toggleTheme=function(){
+  var next=document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark";
+  localStorage.setItem("epa_theme",next);
+  document.documentElement.setAttribute("data-theme",next);
+  var btn=document.getElementById("theme-toggle");
+  if(btn) btn.textContent=next==="dark"?"☀️":"🌙";
+};
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;0,700;1,300&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
+  color-scheme:light;
   --navy:#0a2342;--teal:#0d7377;--gold:#c9962a;--gold-light:#f0c060;
   --ttd:#2563eb;--found:#059669;--core:#7c3aed;--ttp:#dc2626;
   --bg:#f0ede6;--card:#ffffff;--text:#1a1a2e;--muted:#6b7280;--border:#e5e7eb;
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d1420;--card:#161f2e;--text:#e6e9ef;--muted:#8b95a5;--border:#2a3648;
 }
 body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 
@@ -272,9 +292,54 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
   .view-tabs{font-size:.7rem}
   .vtab{padding:.25rem .55rem;font-size:.7rem}
 }
+
+/* ── DARK MODE ── */
+#theme-toggle{position:fixed;bottom:1rem;left:1rem;z-index:350;width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);font-size:1.05rem;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+[data-theme="dark"] .auth-card{background:var(--card);box-shadow:0 32px 80px rgba(0,0,0,.6)}
+[data-theme="dark"] .auth-title{color:var(--gold-light)}
+[data-theme="dark"] .tab-row{background:#0a111c}
+[data-theme="dark"] .tab-btn.active{background:var(--card);color:var(--gold-light)}
+[data-theme="dark"] .auth-input,
+[data-theme="dark"] .profile-input,
+[data-theme="dark"] .modal-input,
+[data-theme="dark"] .search-input{background:#0a111c;color:var(--text)}
+[data-theme="dark"] .auth-error{background:rgba(185,28,28,.18);border-color:rgba(252,165,165,.35);color:#fca5a5}
+[data-theme="dark"] .profile-panel{background:var(--card)}
+[data-theme="dark"] .profile-label{color:#cbd5e1}
+[data-theme="dark"] .pgy-opt{background:#0a111c;color:var(--muted)}
+[data-theme="dark"] .pgy-opt.sel{background:rgba(13,115,119,.22);color:#5eead4}
+[data-theme="dark"] .profile-save-msg{color:#4ade80}
+[data-theme="dark"] .stage-tab{background:var(--card);color:var(--muted)}
+[data-theme="dark"] .req-row{background:#0a111c;border-color:#1c2536}
+[data-theme="dark"] .req-row.req-complete{background:rgba(5,150,105,.15);border-color:rgba(5,150,105,.35)}
+[data-theme="dark"] .req-name-done{color:#6ee7ac}
+[data-theme="dark"] .req-hint{background:rgba(79,70,229,.15);border-color:rgba(79,70,229,.4);color:#a5b4fc}
+[data-theme="dark"] .req-hint strong{color:#c7d2fe}
+[data-theme="dark"] .cval{background:#0a111c;color:var(--text)}
+[data-theme="dark"] .auto-badge{background:rgba(3,105,161,.25);color:#7dd3fc}
+[data-theme="dark"] .obs-auto{background:rgba(22,101,52,.2);border-color:rgba(134,239,172,.4);color:#86efac}
+[data-theme="dark"] .req-row-obs{background:rgba(59,130,246,.1);border-left-color:#3b82f6}
+[data-theme="dark"] .log-entry{background:#0a111c;border-color:#1c2536;color:#cbd5e1}
+[data-theme="dark"] .modal{background:var(--card)}
+[data-theme="dark"] .modal-title{color:var(--gold-light)}
+[data-theme="dark"] .modal-label{color:#cbd5e1}
+[data-theme="dark"] .modal-cancel{background:#0a111c;color:var(--muted)}
+[data-theme="dark"] .toggle-btn{background:#0a111c;color:var(--muted)}
+[data-theme="dark"] .mod-title,
+[data-theme="dark"] .res-name,
+[data-theme="dark"] .res-detail-name{color:var(--gold-light)}
+[data-theme="dark"] .res-card,
+[data-theme="dark"] .res-detail-panel{background:var(--card)}
+[data-theme="dark"] .res-prog-track,
+[data-theme="dark"] .mbar{background:#0a111c}
+[data-theme="dark"] .mod-epa-table td{border-bottom-color:#1c2536}
+[data-theme="dark"] .mod-epa-table tr:hover td{background:#0a111c}
 </style>
 </head>
 <body>
+
+<button id="theme-toggle" onclick="toggleTheme()" title="Toggle light/dark mode" aria-label="Toggle light/dark mode"></button>
+<script>document.getElementById("theme-toggle").textContent=document.documentElement.getAttribute("data-theme")==="dark"?"☀️":"🌙";</script>
 
 <!-- LOADING -->
 <div id="loading-screen">
@@ -476,8 +541,26 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
         </select>
       </div>
     </div>
-    <button class="profile-save-btn" onclick="saveProfile()">Save Profile</button>
+    <button class="profile-save-btn" id="save-profile-btn" onclick="saveProfile()">Save Profile</button>
     <div class="profile-save-msg" id="prof-save-msg"></div>
+
+    <div class="profile-section" style="margin-top:1.75rem">
+      <div class="profile-section-title">Change Password</div>
+      <div class="profile-field">
+        <span class="profile-label">Current Password</span>
+        <input class="profile-input" id="prof-cur-pw" type="password" placeholder="Current password" autocomplete="current-password"/>
+      </div>
+      <div class="profile-field">
+        <span class="profile-label">New Password</span>
+        <input class="profile-input" id="prof-new-pw" type="password" placeholder="New password (min 6 chars)" autocomplete="new-password"/>
+      </div>
+      <div class="profile-field">
+        <span class="profile-label">Confirm New Password</span>
+        <input class="profile-input" id="prof-new-pw2" type="password" placeholder="Confirm new password" autocomplete="new-password"/>
+      </div>
+      <button class="profile-save-btn" id="pw-change-btn" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)" onclick="changePassword()">Change Password</button>
+      <div class="profile-save-msg" id="pw-change-msg"></div>
+    </div>
   </div>
 </div>
 
@@ -715,8 +798,21 @@ window.doSignOut=function(){
 // ─────────────────────────────────────────────
 function getCount(epaId,key){return(progress[epaId]&&progress[epaId][key])||0;}
 function getLogs(epaId,key){return(logs[epaId]&&logs[epaId][key])||[];}
-function isEPADone(epa){return epa.reqs.every(r=>getCount(epa.id,r.k)>=r.t);}
-function metReqs(epa){return epa.reqs.filter(r=>getCount(epa.id,r.k)>=r.t).length;}
+// "Total Observations" is derived live from the sub-criteria counts for EPAs that have
+// sub-criteria, so it can never drift out of sync with them. EPAs with only a single
+// "obs" requirement (no sub-criteria) still store it as a normal loggable counter.
+function reqCount(epa,r){
+  if(r.k==='obs'&&epa.reqs.length>1){
+    return epa.reqs.reduce((sum,x)=>x.k==='obs'?sum:sum+getCount(epa.id,x.k),0);
+  }
+  return getCount(epa.id,r.k);
+}
+function epaObsCount(epa){
+  const obsReq=epa.reqs.find(r=>r.k==='obs');
+  return obsReq?reqCount(epa,obsReq):0;
+}
+function isEPADone(epa){return epa.reqs.every(r=>reqCount(epa,r)>=r.t);}
+function metReqs(epa){return epa.reqs.filter(r=>reqCount(epa,r)>=r.t).length;}
 
 function scheduleSave(){
   clearTimeout(saveTimer);
@@ -732,7 +828,7 @@ function scheduleSave(){
 
 function updateStats(){
   let totalObs=0;
-  EPAS.forEach(e=>e.reqs.forEach(r=>{totalObs+=getCount(e.id,r.k);}));
+  EPAS.forEach(e=>{totalObs+=epaObsCount(e);});
   const done=EPAS.filter(isEPADone).length;
   const pct=Math.round((done/EPAS.length)*100);
   document.getElementById("s-obs").textContent=totalObs;
@@ -768,6 +864,10 @@ window.openProfile=function(){
     document.getElementById("pgy-opt-"+n).classList.toggle("sel",n===selectedPGY);
   });
   document.getElementById("prof-save-msg").textContent="";
+  document.getElementById("prof-cur-pw").value="";
+  document.getElementById("prof-new-pw").value="";
+  document.getElementById("prof-new-pw2").value="";
+  document.getElementById("pw-change-msg").textContent="";
   document.getElementById("profile-overlay").classList.add("open");
   setTimeout(()=>document.getElementById("profile-panel").classList.add("open"),10);
 };
@@ -812,7 +912,7 @@ window.saveProfile=async function(){
   const rotation=document.getElementById("prof-rotation").value.trim();
   const site=document.getElementById("prof-site").value;
   const msg=document.getElementById("prof-save-msg");
-  const btn=document.querySelector(".profile-save-btn");
+  const btn=document.getElementById("save-profile-btn");
   btn.disabled=true; btn.textContent="Saving…";
   msg.style.color="";
   try{
@@ -887,6 +987,36 @@ window.saveProfile=async function(){
     msg.style.color="#b91c1c";
   }
   btn.disabled=false; btn.textContent="Save Profile";
+};
+
+window.changePassword=async function(){
+  const cur=document.getElementById("prof-cur-pw").value;
+  const next=document.getElementById("prof-new-pw").value;
+  const next2=document.getElementById("prof-new-pw2").value;
+  const msg=document.getElementById("pw-change-msg");
+  const btn=document.getElementById("pw-change-btn");
+  msg.style.color="#b91c1c";
+  if(!cur||!next||!next2){msg.textContent="Please fill in all three fields.";return;}
+  if(hashPw(cur)!==currentUser.pwHash){msg.textContent="Current password is incorrect.";return;}
+  if(next.length<6){msg.textContent="New password must be at least 6 characters.";return;}
+  if(next!==next2){msg.textContent="New passwords do not match.";return;}
+  if(next===cur){msg.textContent="New password must be different from your current one.";return;}
+  btn.disabled=true; btn.textContent="Updating…";
+  try{
+    const newHash=hashPw(next);
+    await setDoc(doc(db,"users",currentUser.username),{...currentUser,pwHash:newHash});
+    currentUser.pwHash=newHash;
+    msg.style.color="#059669";
+    msg.textContent="✓ Password updated";
+    document.getElementById("prof-cur-pw").value="";
+    document.getElementById("prof-new-pw").value="";
+    document.getElementById("prof-new-pw2").value="";
+    setTimeout(()=>{msg.textContent="";},2500);
+  }catch(e){
+    msg.style.color="#b91c1c";
+    msg.textContent="Failed to update — check connection.";
+  }
+  btn.disabled=false; btn.textContent="Change Password";
 };
 
 // ─────────────────────────────────────────────
@@ -1003,9 +1133,9 @@ function renderEPAs(){
     if(isEPADone(epa)) card.classList.add("epa-done");
 
     const reqsHtml=epa.reqs.map(r=>{
-      const cnt=getCount(epa.id,r.k);
+      const cnt=reqCount(epa,r);
       const done=cnt>=r.t;
-      const isObs=r.k==='obs';
+      const isObs=r.k==='obs'&&epa.reqs.length>1;
       const entryLogs=isObs?[]:getLogs(epa.id,r.k);
       const entriesHtml=entryLogs.length?`<div class="log-entries">${entryLogs.map((lg,i)=>`
         <div class="log-entry">
@@ -1091,12 +1221,12 @@ function updateCard(epaId){
   if(!card) return;
   const epa=EPAS.find(e=>e.id===epaId);
   epa.reqs.forEach(req=>{
-    const cnt=getCount(epaId,req.k);
+    const cnt=reqCount(epa,req);
     const done=cnt>=req.t;
     const valEl=card.querySelector(`#cv-${epaId}-${req.k}`);
     if(valEl){
       valEl.textContent=cnt;
-      if(req.k!=='obs'){
+      if(!(req.k==='obs'&&epa.reqs.length>1)){
         const row=valEl.closest(".counter");
         if(row){
           const minus=row.querySelector(".cbtn-minus");
@@ -1140,20 +1270,6 @@ window.changeCount=function(epaId,key,delta,target){
   if(delta<0 && logs[epaId] && logs[epaId][key] && logs[epaId][key].length>0){
     logs[epaId][key].pop();
   }
-  // Auto-sync Total Observations (obs) when a sub-category changes
-  if(key!=='obs'){
-    const epa=EPAS.find(e=>e.id===epaId);
-    const obsReq=epa&&epa.reqs.find(r=>r.k==='obs');
-    if(obsReq){
-      const actualDelta=nv-cur;
-      const curObs=progress[epaId]['obs']||0;
-      progress[epaId]['obs']=Math.max(0,curObs+actualDelta);
-      // also sync logs for obs if decrementing
-      if(actualDelta<0 && logs[epaId]&&logs[epaId]['obs']&&logs[epaId]['obs'].length>0){
-        logs[epaId]['obs'].pop();
-      }
-    }
-  }
   updateCard(epaId);
   updateStats();
   scheduleSave();
@@ -1164,18 +1280,6 @@ window.deleteLog=function(epaId,key,idx){
     logs[epaId][key].splice(idx,1);
     if(!progress[epaId]) progress[epaId]={};
     progress[epaId][key]=Math.max(0,(progress[epaId][key]||1)-1);
-    // Auto-sync obs when a sub-category log is deleted
-    if(key!=='obs'){
-      const epa=EPAS.find(e=>e.id===epaId);
-      const obsReq=epa&&epa.reqs.find(r=>r.k==='obs');
-      if(obsReq){
-        progress[epaId]['obs']=Math.max(0,(progress[epaId]['obs']||1)-1);
-        if(logs[epaId]['obs']&&logs[epaId]['obs'].length>0){
-          const autoIdx=logs[epaId]['obs'].findLastIndex(e=>e._autoFromKey===key);
-          if(autoIdx>=0) logs[epaId]['obs'].splice(autoIdx,1);
-        }
-      }
-    }
     renderEPAs();
     updateStats();
     scheduleSave();
@@ -1233,16 +1337,6 @@ window.saveLog=function(){
   logs[epaId][reqKey].push(entry);
   if(!progress[epaId]) progress[epaId]={};
   progress[epaId][reqKey]=(progress[epaId][reqKey]||0)+1;
-  // Auto-sync Total Observations (obs) when a sub-category is logged via modal
-  if(reqKey!=='obs'){
-    const epa=EPAS.find(e=>e.id===epaId);
-    const obsReq=epa&&epa.reqs.find(r=>r.k==='obs');
-    if(obsReq){
-      progress[epaId]['obs']=(progress[epaId]['obs']||0)+1;
-      if(!logs[epaId]['obs']) logs[epaId]['obs']=[];
-      logs[epaId]['obs'].push({...entry,_autoFromKey:reqKey});
-    }
-  }
   closeModal();
   renderEPAs();
   // re-open the card
@@ -1301,7 +1395,7 @@ function calcResidentStats(resProgress){
   progress=resProgress;
   const done=EPAS.filter(isEPADone).length;
   let totalObs=0;
-  EPAS.forEach(e=>e.reqs.forEach(r=>{totalObs+=getCount(e.id,r.k);}));
+  EPAS.forEach(e=>{totalObs+=epaObsCount(e);});
   const stageStats={};
   ["TTD","Foundations","Core","TTP"].forEach(s=>{
     const epas=EPAS.filter(e=>e.stage===s);
@@ -1484,12 +1578,12 @@ window.printResidentReport=function(username){
   const stageNames={TTD:"Transition to Discipline",Foundations:"Foundations",Core:"Core",TTP:"Transition to Practice"};
   const totalDone=EPAS.filter(isEPADone).length;
   const totalPct=Math.round((totalDone/EPAS.length)*100);
-  let totalObs=0; EPAS.forEach(e=>e.reqs.forEach(r=>{totalObs+=getCount(e.id,r.k);}));
+  let totalObs=0; EPAS.forEach(e=>{totalObs+=epaObsCount(e);});
   const stageSummaryHtml=stages.map(s=>{
     const epasInStage=EPAS.filter(e=>e.stage===s);
     const doneSt=epasInStage.filter(isEPADone).length;
     const pct=Math.round((doneSt/epasInStage.length)*100);
-    let stageObs=0;epasInStage.forEach(e=>e.reqs.forEach(r=>{stageObs+=getCount(e.id,r.k);}));
+    let stageObs=0;epasInStage.forEach(e=>{stageObs+=epaObsCount(e);});
     return `<div style="border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.25rem;border-left:5px solid ${stageColors[s]}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
         <div><div style="font-weight:700;font-size:.95rem">${stageNames[s]}</div><div style="font-size:.75rem;color:#6b7280;margin-top:.1rem">${stageObs} observations</div></div>
@@ -1634,13 +1728,13 @@ window.printReport=function(){
   const stageNames=STAGE_NAMES;
   const totalDone=EPAS.filter(isEPADone).length;
   const totalPct=Math.round((totalDone/EPAS.length)*100);
-  let totalObs=0; EPAS.forEach(e=>e.reqs.forEach(r=>{totalObs+=getCount(e.id,r.k);}));
+  let totalObs=0; EPAS.forEach(e=>{totalObs+=epaObsCount(e);});
 
   const stageSummaryHtml=stages.map(s=>{
     const epasInStage=EPAS.filter(e=>e.stage===s);
     const doneSt=epasInStage.filter(isEPADone).length;
     const pct=Math.round((doneSt/epasInStage.length)*100);
-    let stageObs=0;epasInStage.forEach(e=>e.reqs.forEach(r=>{stageObs+=getCount(e.id,r.k);}));
+    let stageObs=0;epasInStage.forEach(e=>{stageObs+=epaObsCount(e);});
     return `<div style="border:1px solid #e5e7eb;border-radius:10px;padding:1rem 1.25rem;border-left:5px solid ${stageColors[s]}">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem">
         <div><div style="font-weight:700;font-size:.95rem">${stageNames[s]}</div><div style="font-size:.75rem;color:#6b7280;margin-top:.1rem">${stageObs} observations</div></div>
