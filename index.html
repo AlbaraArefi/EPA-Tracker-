@@ -204,7 +204,9 @@ body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(-
 /* ── LOG ENTRIES (mini cards below each req) ── */
 .log-entries{margin-top:.5rem;display:flex;flex-direction:column;gap:.25rem}
 .log-entry{display:flex;align-items:center;gap:.5rem;padding:.4rem .65rem;background:white;border:1px solid var(--border);border-radius:6px;font-size:.72rem;color:#374151}
-.log-entry-delete{margin-left:auto;background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.85rem;padding:0 .15rem;transition:color .15s}
+.log-entry-edit{margin-left:auto;background:none;border:none;cursor:pointer;color:#93c5fd;font-size:.78rem;padding:0 .15rem;transition:color .15s}
+.log-entry-edit:hover{color:#2563eb}
+.log-entry-delete{background:none;border:none;cursor:pointer;color:#fca5a5;font-size:.85rem;padding:0 .15rem;transition:color .15s}
 .log-entry-delete:hover{color:#b91c1c}
 .log-chip{display:inline-flex;align-items:center;padding:.1rem .45rem;border-radius:999px;font-size:.64rem;font-weight:600;white-space:nowrap}
 .chip-real{background:#dbeafe;color:#1e40af}
@@ -666,7 +668,7 @@ const STAGE_NAMES={TTD:"Transition to Discipline",Foundations:"Foundations",Core
 const MOD_CODE_HASH = "a8l4d4_14";
 
 let progress={}, logs={}, activeStage="all", currentUser=null, saveTimer=null;
-let activeModal={epaId:null,reqKey:null,reqLabel:null};
+let activeModal={epaId:null,reqKey:null,reqLabel:null,editIndex:null};
 let modalType="real", modalObserver=null;
 let allResidents=[];
 let currentPGY=null; // user-set PGY year (1-4)
@@ -1144,6 +1146,7 @@ function renderEPAs(){
           ${lg.date?`<span style="color:#6b7280">${lg.date}</span>`:""}
           ${lg.rotation?`<span style="color:#9ca3af;font-style:italic">${lg.rotation}</span>`:""}
           ${lg.notes?`<span style="color:#374151;font-style:italic;font-size:.7rem">📝 ${lg.notes}</span>`:""}
+          <button class="log-entry-edit" onclick="event.stopPropagation();editLog('${epa.id}','${r.k}',${i})" title="Edit">✏️</button>
           <button class="log-entry-delete" onclick="event.stopPropagation();deleteLog('${epa.id}','${r.k}',${i})" title="Remove">✕</button>
         </div>`).join("")}</div>`:"";
       // obs row: auto-tallied, read-only
@@ -1290,7 +1293,7 @@ window.deleteLog=function(epaId,key,idx){
 //  LOG MODAL
 // ─────────────────────────────────────────────
 window.openModal=function(epaId,reqKey,reqLabel,epaTitle,target){
-  activeModal={epaId,reqKey,reqLabel,target};
+  activeModal={epaId,reqKey,reqLabel,target,editIndex:null};
   modalType="real"; modalObserver=null;
   const curCnt=getCount(epaId,reqKey);
   document.getElementById("modal-epa-title").textContent=epaTitle;
@@ -1301,6 +1304,26 @@ window.openModal=function(epaId,reqKey,reqLabel,epaTitle,target){
   document.getElementById("modal-notes").value="";
   ["tog-real","tog-sim","tog-SR","tog-Consultant","tog-Supervisor"].forEach(id=>document.getElementById(id).className="toggle-btn");
   document.getElementById("tog-real").classList.add("sel-real");
+  document.querySelector(".modal-save").textContent="Save Observation ✓";
+  document.getElementById("log-modal").classList.add("open");
+};
+
+window.editLog=function(epaId,reqKey,idx){
+  const epa=EPAS.find(e=>e.id===epaId);
+  const req=epa.reqs.find(r=>r.k===reqKey);
+  const entry=logs[epaId][reqKey][idx];
+  activeModal={epaId,reqKey,reqLabel:req.l,target:req.t,editIndex:idx};
+  modalType=entry.type||"real";
+  modalObserver=entry.observer||null;
+  document.getElementById("modal-epa-title").textContent=epa.title;
+  document.getElementById("modal-req-name").innerHTML=req.l+` <span style="background:#eef2ff;color:#4338ca;padding:.1rem .4rem;border-radius:999px;font-size:.7rem;font-weight:600">✏️ Editing entry</span>`;
+  document.getElementById("modal-date").value=entry.date||new Date().toISOString().split("T")[0];
+  document.getElementById("modal-rotation").value=entry.rotation||"";
+  document.getElementById("modal-notes").value=entry.notes||"";
+  ["tog-real","tog-sim","tog-SR","tog-Consultant","tog-Supervisor"].forEach(id=>document.getElementById(id).className="toggle-btn");
+  document.getElementById(modalType==="sim"?"tog-sim":"tog-real").classList.add(modalType==="sim"?"sel-sim":"sel-real");
+  if(modalObserver) document.getElementById("tog-"+modalObserver).classList.add("sel-"+modalObserver);
+  document.querySelector(".modal-save").textContent="Save Changes ✓";
   document.getElementById("log-modal").classList.add("open");
 };
 
@@ -1322,7 +1345,7 @@ window.selectObserver=function(o){
 };
 
 window.saveLog=function(){
-  const {epaId,reqKey,target}=activeModal;
+  const {epaId,reqKey,editIndex}=activeModal;
   if(!modalObserver){
     document.getElementById("tog-SR").style.outline="2px solid red";
     setTimeout(()=>document.getElementById("tog-SR").style.outline="",1500);
@@ -1331,12 +1354,17 @@ window.saveLog=function(){
   const date=document.getElementById("modal-date").value;
   const rotation=document.getElementById("modal-rotation").value.trim();
   const notes=document.getElementById("modal-notes").value.trim();
-  const entry={type:modalType,observer:modalObserver,date,rotation,notes,ts:Date.now()};
   if(!logs[epaId]) logs[epaId]={};
   if(!logs[epaId][reqKey]) logs[epaId][reqKey]=[];
-  logs[epaId][reqKey].push(entry);
-  if(!progress[epaId]) progress[epaId]={};
-  progress[epaId][reqKey]=(progress[epaId][reqKey]||0)+1;
+  if(editIndex!=null){
+    // Editing an existing entry's details only — doesn't change the count.
+    const oldTs=(logs[epaId][reqKey][editIndex]&&logs[epaId][reqKey][editIndex].ts)||Date.now();
+    logs[epaId][reqKey][editIndex]={type:modalType,observer:modalObserver,date,rotation,notes,ts:oldTs};
+  }else{
+    logs[epaId][reqKey].push({type:modalType,observer:modalObserver,date,rotation,notes,ts:Date.now()});
+    if(!progress[epaId]) progress[epaId]={};
+    progress[epaId][reqKey]=(progress[epaId][reqKey]||0)+1;
+  }
   closeModal();
   renderEPAs();
   // re-open the card
